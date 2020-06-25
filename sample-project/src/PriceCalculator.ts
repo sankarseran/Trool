@@ -32,8 +32,10 @@ class PriceCalculator {
         visitors = (visitors instanceof Array) ? visitors : [visitors];
         try {
             const csvFilePath = path.join(__dirname, this.CSV_FILE);
+            console.log('Import:::', await this.trool.getImports(csvFilePath))
             const facts = this.setupFactsHolder(visitors, ticketOpt);
             const updatedFacts = await this.trool.applyRules(csvFilePath, facts);
+            console.log('updatedFacts ------------------------------', updatedFacts);
             totalPrice = this.addUpEachTicketPrice(updatedFacts);
         } catch (err) {
             cerr(err);

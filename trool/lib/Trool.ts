@@ -40,6 +40,33 @@ class Trool {
         }
     }
 
+    public async publicImports(filePath: string, imports: IImportsHolder): Promise<IImportsHolder> {
+        let importName = '';
+        let newImportObj: any = {};
+        try {
+            const jsonArr = await csvToJson().fromFile(filePath);
+            for (let i = 0; i < jsonArr.length; i++) {
+                const firstCell = jsonArr[i].field1.trim();
+    
+                if (firstCell.startsWith('Import:')) {
+                    importName = this.getImportName(firstCell, imports);
+                } else if (importName) {
+                    if (!/^[a-zA-Z0-9-_]+$/.test(firstCell)) {
+                        throw Error(this.IMPORT_PROP_ERR + firstCell);
+                    }
+                    newImportObj[firstCell] = parseCell(jsonArr[i].field2, imports);
+                    if (this.isLastRow(jsonArr, i)) {
+                        imports[importName] = newImportObj;
+                        importName = '';
+                        newImportObj = {};
+                    }
+                }
+            }
+            return imports;
+        } catch (err) {
+            throw err;
+        }
+    }
 
     /*********************************************************************************************
      *                            Add Imports from Spreadsheet
